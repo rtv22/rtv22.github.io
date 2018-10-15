@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<title>liang-barsky</title>
+</head>
+<body>
+	<h1 style = "text-align: center; font-size: 20px; margin: 15px">Метод Лианга-Барски</h1> <!--23+15+15 = 53-->
+	<canvas id="cvs" style="border: 2px solid black" height="700" width="700"></canvas>
+
+	<div style="display: flex; flex-direction: column;">
+		<button type="button" onclick="line();" style="width: 100px">Отрезок</button>
+		<button type="button" onclick="rect()" style="width: 100px">Прямоугольник</button>
+		<button type="button" id="clear" style="width: 100px">Очистить</button>
+	</div>
+	<div>
+	</div>
+
+	<script>
+		var ctx = document.getElementById('cvs').getContext('2d');
+		var mouse = {x0:0,y0:0,x1:0,y1:0};
+		var count = 0;
+		lines = [];
+		var button = document.getElementById('clear');
+		button.addEventListener('click',clear,false);
+		function line()
+		{
+			cvs.removeEventListener('click', rectListener,false);
+			cvs.addEventListener('click',lineListener,false);
+		}
+		function rect()
+		{
+			cvs.removeEventListener('click', lineListener,false);
+			cvs.addEventListener('click',rectListener,false);
+		}
+		function clear()
+		{
+			button.removeEventListener('click', lineListener,false);
+			button.removeEventListener('click', rectListener,false);
+			ctx.clearRect(0,0,700,700);
+			lines = [];
+		}
+		var lineListener = function(event)
+		{
+			var mouse__coords = get__mouse__coords(cvs);
+			lines.push(mouse__coords.x0);
+			lines.push(mouse__coords.y0);
+			lines.push(mouse__coords.x1);
+			lines.push(mouse__coords.y1);
+			draw__line(mouse__coords.x0,mouse__coords.y0,mouse__coords.x1,mouse__coords.y1);
+		}
+		var rectListener = function(event)
+		{
+			var mouse__coords = get__mouse__coords(cvs);
+			draw__rect(mouse__coords.x0,mouse__coords.y0,mouse__coords.x1,mouse__coords.y1);
+		}
+		function get__mouse__coords(cvs)
+		{
+			if(count == 0)
+			{
+				mouse.x0 = event.pageX;
+				mouse.y0 = event.pageY - 53;
+				count++;
+			}
+			else if (count == 1)
+			{
+				mouse.x1 = event.pageX;
+				mouse.y1 = event.pageY - 53;
+				count++;
+			}
+			ctx.fillRect(event.pageX, event.pageY - 53, 1, 1);
+			if(count == 2)
+			{
+				count = 0;
+				return mouse;
+			}
+		}
+		function draw__line(x0,y0,x1,y1)
+		{
+			ctx.beginPath()
+			ctx.lineWidth = 1;
+			ctx.strokeStyle = "black";
+			ctx.moveTo(x0,y0);
+			ctx.lineTo(x1,y1);
+			ctx.stroke();
+		}
+		function draw__rect(x0,y0,x1,y1)
+		{
+			if(x0<x1&&y0<y1) liang__barsky(x0,y0,x1,y1);
+			else if(x0<x1&&y0>y1) liang__barsky(x0,y1,x1,y0);
+			else if(x0>x1&&y0>y1) liang__barsky(x1,y1,x0,y0);
+			else if(x0>x1&&y0<y1) liang__barsky(x1,y0,x0,y1);
+		}
+		function liang__barsky(Xmin,Ymin,Xmax,Ymax)
+		{
+			ctx.clearRect(0,0,700,700);
+			for(var i = 0;i < lines.length;i+=4)
+			{
+				var flag = true;
+				var t0 = 0, t1 = 1;
+				var x0 = lines[i], y0 = lines[i+1], x1 = lines[i+2], y1 = lines[i+3];
+				var m = [-(x1 - x0),x1 - x0,-(y1 - y0),y1 - y0];
+				var q = [x0 - Xmin,Xmax - x0,y0 - Ymin,Ymax  - y0];
+				for(var k = 0; k < 4; k++)
+				{
+					var r = q[k]/m[k];
+					if(m[k] < 0)
+					{
+						if(t1 < r) flag = false;
+						else if(t0 < r) t0 = r;
+					}
+					else if (m[k] > 0)
+					{
+						if(t0 > r) flag = false;
+						else if(t1 > r) t1 = r;
+					}
+					else if(q[k] < 0) flag = false;				
+					if(t0 > t1) flag = false;
+				}
+				if(flag)
+				{
+					draw__line(x0 + t0*(x1 - x0),
+						y0 + t0*(y1 - y0),
+						x0 + t1*(x1 - x0),
+						y0 + t1*(y1 - y0));
+				}
+			}
+			ctx.strokeRect(Xmin,Ymin,Xmax - Xmin,Ymax - Ymin);
+		}
+	 </script>
+</body>
+</html>
