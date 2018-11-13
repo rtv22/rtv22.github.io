@@ -87,8 +87,8 @@
 				if(event.which == 1)
 				{
 					coords.push([x, y]);
-					ctx.strokeStyle = "#F3A505";
-					ctx.fillStyle = "#F3A505";
+					ctx.strokeStyle = "#F3BBF5"";
+					ctx.fillStyle = "#F3BBF5";
 					if(coords.length == 1) draw__pixel([x, y]);
 					if(coords.length > 1) draw__line(coords[coords.length - 2], coords[coords.length - 1]);
 				}
@@ -103,7 +103,7 @@
 		   			}
 		   			for(let i = 0; i < points.length - 1; i++)
 		   			{
-						ctx.strokeStyle = "#A5260A";
+						ctx.strokeStyle = "#A58FFA";
 						draw__line(points[i],points[i+1]);
 		   			}
 					coords = [];
